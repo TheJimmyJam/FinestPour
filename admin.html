@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin · The Finest Pour</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0c0c0d;
+    --bg-elev: #141416;
+    --bg-card: #1a1a1d;
+    --line: #26262a;
+    --line-soft: #1f1f22;
+    --text: #f1ede3;
+    --text-dim: #a8a59c;
+    --text-muted: #6b6862;
+    --gold: #c9a961;
+    --gold-soft: #d9bf85;
+    --sage: #5fa399;
+    --sage-deep: #397F77;
+    --danger: #c45a5a;
+    --success: #6fa86a;
+    --warn: #d7a86e;
+    --serif: "Cormorant Garamond", "Times New Roman", serif;
+    --sans: "Inter", -apple-system, sans-serif;
+    --radius: 4px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: var(--sans); font-weight: 300;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--gold); text-decoration: none; }
+  h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.2; }
+  input, select, textarea, button { font-family: inherit; font-size: inherit; }
+
+  /* ── Login gate ──────────────────────────────────── */
+  .gate {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    background:
+      radial-gradient(ellipse at center, rgba(57,127,119,0.15), transparent 60%),
+      var(--bg);
+    padding: 2rem 1rem;
+  }
+  .gate-card {
+    width: 100%; max-width: 420px;
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    padding: 3rem 2.5rem;
+    text-align: center;
+    border-radius: var(--radius);
+  }
+  .gate-card .logo {
+    font-family: var(--serif); font-size: 1.8rem; margin-bottom: 0.4rem;
+  }
+  .gate-card .logo span { color: var(--gold); font-style: italic; }
+  .gate-card .sub {
+    font-size: 0.72rem; letter-spacing: 0.32em;
+    text-transform: uppercase; color: var(--gold);
+    margin-bottom: 2rem;
+  }
+  .gate-card h2 { margin-bottom: 0.5rem; }
+  .gate-card p { color: var(--text-dim); margin-bottom: 2rem; font-size: 0.93rem; }
+
+  .pin-input {
+    width: 100%; padding: 1rem; text-align: center;
+    background: var(--bg); border: 1px solid var(--line);
+    color: var(--text); letter-spacing: 0.5em; font-size: 1.4rem;
+    border-radius: var(--radius);
+  }
+  .pin-input:focus { outline: none; border-color: var(--gold); }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    padding: 0.85rem 1.6rem; font-size: 0.85rem; font-weight: 500;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    background: var(--gold); color: var(--bg);
+    border: 1px solid var(--gold); cursor: pointer;
+    transition: all 0.2s; border-radius: var(--radius);
+  }
+  .btn:hover { background: var(--gold-soft); }
+  .btn.full { width: 100%; }
+  .btn.ghost { background: transparent; color: var(--text); border-color: var(--line); }
+  .btn.ghost:hover { border-color: var(--text); }
+  .btn.outline { background: transparent; color: var(--gold); }
+  .btn.outline:hover { background: var(--gold); color: var(--bg); }
+  .btn.danger { background: var(--danger); border-color: var(--danger); color: var(--text); }
+  .btn.danger:hover { background: #b34c4c; }
+  .btn.sm { padding: 0.45rem 0.9rem; font-size: 0.72rem; letter-spacing: 0.12em; }
+
+  /* ── Layout ──────────────────────────────────────── */
+  .app { display: none; min-height: 100vh; }
+  .app.active { display: grid; grid-template-columns: 260px 1fr; }
+  @media (max-width: 880px) {
+    .app.active { grid-template-columns: 1fr; }
+    .sidebar { position: static !important; }
+    .sidebar-toggle { display: block !important; }
+  }
+
+  .sidebar {
+    background: var(--bg-elev);
+    border-right: 1px solid var(--line);
+    padding: 2rem 0;
+    position: sticky; top: 0; height: 100vh;
+    overflow-y: auto;
+  }
+  .sidebar .logo {
+    font-family: var(--serif); font-size: 1.45rem;
+    padding: 0 2rem; margin-bottom: 0.2rem;
+  }
+  .sidebar .logo span { color: var(--gold); font-style: italic; }
+  .sidebar .role {
+    padding: 0 2rem; margin-bottom: 2.5rem;
+    font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .sb-link {
+    display: flex; align-items: center; gap: 0.85rem;
+    padding: 0.85rem 2rem;
+    font-size: 0.92rem; color: var(--text-dim);
+    cursor: pointer; transition: all 0.18s;
+    border-left: 2px solid transparent;
+  }
+  .sb-link:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+  .sb-link.active {
+    color: var(--gold); border-left-color: var(--gold);
+    background: rgba(201,169,97,0.05);
+  }
+  .sb-link .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.6; }
+  .sb-foot {
+    margin-top: 2rem; padding: 1.5rem 2rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.78rem; color: var(--text-muted);
+  }
+
+  /* ── Main ─────────────────────────────────────────── */
+  main {
+    padding: 2.5rem clamp(1.25rem, 3vw, 3rem);
+    max-width: 1200px;
+  }
+  .page-head {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    flex-wrap: wrap; gap: 1rem;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .page-head h1 { font-size: 2.2rem; }
+  .page-head p { color: var(--text-dim); font-size: 0.92rem; margin-top: 0.4rem; }
+
+  .stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1px; background: var(--line); border: 1px solid var(--line);
+    margin-bottom: 2.5rem; border-radius: var(--radius); overflow: hidden;
+  }
+  .stat { background: var(--bg-elev); padding: 1.5rem; }
+  .stat-label { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 0.6rem; }
+  .stat-value { font-family: var(--serif); font-size: 2.4rem; line-height: 1; color: var(--gold); }
+  .stat-trend { font-size: 0.78rem; margin-top: 0.5rem; color: var(--success); }
+  .stat-trend.flat { color: var(--text-muted); }
+
+  .panel {
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    margin-bottom: 1.5rem;
+  }
+  .panel-head {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--line);
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 0.5rem;
+  }
+  .panel-head h3 { font-size: 1.3rem; }
+  .panel-head p { color: var(--text-muted); font-size: 0.83rem; margin-top: 0.2rem; }
+  .panel-body { padding: 1.5rem; }
+
+  /* ── Tables ──────────────────────────────────────── */
+  .booking-list { display: flex; flex-direction: column; }
+  .booking-row {
+    display: grid; grid-template-columns: 90px 1.4fr 1.4fr 1fr 110px 90px;
+    gap: 1rem; align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--line-soft);
+    transition: background 0.15s;
+  }
+  .booking-row.head {
+    font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--line);
+    background: rgba(0,0,0,0.2);
+  }
+  .booking-row:not(.head):hover { background: rgba(255,255,255,0.015); }
+  .booking-row:last-child { border-bottom: 0; }
+  .b-id { font-family: monospace; font-size: 0.78rem; color: var(--text-muted); }
+  .b-name { font-weight: 500; }
+  .b-name span { display: block; font-size: 0.78rem; color: var(--text-muted); font-weight: 300; }
+  .b-svc { color: var(--text-dim); font-size: 0.9rem; }
+  .b-svc span { display: block; font-size: 0.78rem; color: var(--gold); }
+  .b-date { color: var(--text-dim); font-size: 0.9rem; }
+  .b-date span { display: block; font-size: 0.78rem; color: var(--text-muted); }
+  .pill {
+    display: inline-block; padding: 0.25rem 0.7rem;
+    border-radius: 99px; font-size: 0.7rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    border: 1px solid var(--line);
+  }
+  .pill.pending  { color: var(--warn);    border-color: rgba(215,168,110,0.4); background: rgba(215,168,110,0.08); }
+  .pill.confirmed { color: var(--success); border-color: rgba(111,168,106,0.4); background: rgba(111,168,106,0.08); }
+  .pill.cancelled { color: var(--danger);  border-color: rgba(196,90,90,0.4);   background: rgba(196,90,90,0.08); }
+
+  @media (max-width: 880px) {
+    .booking-row { grid-template-columns: 1fr; gap: 0.4rem; padding: 1.1rem 1.25rem; }
+    .booking-row.head { display: none; }
+    .booking-row .b-id::before { content: "ID · "; color: var(--text-muted); }
+    .booking-row .b-svc::before { content: ""; }
+  }
+
+  /* ── Availability ────────────────────────────────── */
+  .day-toggles {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+  }
+  @media (max-width: 540px) { .day-toggles { grid-template-columns: repeat(4, 1fr); } }
+  .day-toggle {
+    padding: 1rem 0.5rem; text-align: center;
+    background: var(--bg); border: 1px solid var(--line);
+    cursor: pointer; transition: all 0.15s;
+    border-radius: var(--radius);
+  }
+  .day-toggle:hover { border-color: var(--gold-soft); }
+  .day-toggle.on { background: rgba(201,169,97,0.1); border-color: var(--gold); color: var(--gold); }
+  .day-toggle .d { font-family: var(--serif); font-size: 1.2rem; display: block; }
+  .day-toggle .lbl { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: inherit; opacity: 0.7; }
+
+  .slot-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+  .slot-pill {
+    padding: 0.55rem 1rem; background: var(--bg);
+    border: 1px solid var(--line); display: inline-flex; align-items: center; gap: 0.5rem;
+    border-radius: 99px; font-size: 0.88rem;
+  }
+  .slot-pill button {
+    background: none; border: 0; color: var(--text-muted); cursor: pointer;
+    font-size: 1rem; line-height: 1;
+  }
+  .slot-pill button:hover { color: var(--danger); }
+  .add-slot { display: flex; gap: 0.5rem; margin-top: 0.85rem; }
+  .add-slot input { flex: 1; }
+
+  .blackout-list { display: flex; flex-direction: column; gap: 0.4rem; max-height: 280px; overflow-y: auto; margin-top: 0.75rem; }
+  .blackout-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.65rem 0.9rem;
+    background: var(--bg); border: 1px solid var(--line);
+    border-radius: var(--radius); font-size: 0.92rem;
+  }
+  .blackout-row button { background: none; border: 0; color: var(--text-muted); cursor: pointer; font-size: 1rem; }
+  .blackout-row button:hover { color: var(--danger); }
+
+  label.field {
+    display: block; font-size: 0.72rem; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.5rem;
+  }
+  input[type="text"], input[type="email"], input[type="tel"], input[type="number"],
+  input[type="time"], input[type="date"], input[type="password"], textarea, select {
+    width: 100%; padding: 0.8rem 1rem;
+    background: var(--bg); border: 1px solid var(--line);
+    color: var(--text); border-radius: var(--radius);
+  }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--gold); }
+  textarea { min-height: 80px; resize: vertical; }
+  .form-row { margin-bottom: 1.25rem; }
+  .form-row.two { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 540px) { .form-row.two { grid-template-columns: 1fr; } }
+
+  .help { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.5; }
+
+  .empty {
+    padding: 3rem 1.5rem; text-align: center; color: var(--text-muted);
+    font-style: italic; font-size: 0.95rem;
+  }
+
+  .toast {
+    position: fixed; bottom: 2rem; right: 2rem;
+    background: var(--sage-deep); color: var(--text);
+    padding: 1rem 1.5rem; border-radius: var(--radius);
+    z-index: 200; opacity: 0; transform: translateY(8px);
+    transition: all 0.25s;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+  .toast.show { opacity: 1; transform: none; }
+  .toast.error { background: var(--danger); }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .integration-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.1rem 0; border-bottom: 1px solid var(--line-soft);
+    flex-wrap: wrap; gap: 0.75rem;
+  }
+  .integration-row:last-child { border-bottom: 0; }
+  .integration-row .info strong { display: block; font-size: 1rem; margin-bottom: 0.2rem; }
+  .integration-row .info span { color: var(--text-muted); font-size: 0.85rem; }
+  .integration-row .status { font-size: 0.75rem; color: var(--text-muted); }
+  .integration-row .status.on { color: var(--success); }
+
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.78);
+    display: none; align-items: center; justify-content: center;
+    z-index: 100; padding: 1.5rem;
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--bg-elev); border: 1px solid var(--line);
+    width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto;
+    border-radius: var(--radius); padding: 2rem;
+    position: relative;
+  }
+  .modal h3 { margin-bottom: 1rem; font-size: 1.5rem; }
+  .modal-close {
+    position: absolute; top: 1rem; right: 1rem;
+    background: none; border: 0; color: var(--text-dim);
+    font-size: 1.4rem; cursor: pointer; width: 32px; height: 32px;
+  }
+  .modal-close:hover { color: var(--text); }
+
+  .detail-row { display: flex; padding: 0.55rem 0;
+    border-bottom: 1px solid var(--line-soft); font-size: 0.93rem; }
+  .detail-row:last-child { border-bottom: 0; }
+  .detail-row .lbl { width: 130px; color: var(--text-muted);
+    font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; padding-top: 0.15rem; }
+  .detail-row .val { flex: 1; color: var(--text); }
+</style>
+</head>
+<body>
+
+<!-- ── Login gate ────────────────────────────────── -->
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <div class="logo">The Finest <span>Pour</span></div>
+    <div class="sub">Admin Portal</div>
+    <h2>Welcome back</h2>
+    <p>Enter your PIN to manage bookings, availability, and settings.</p>
+    <form id="pinForm">
+      <input id="pin" class="pin-input" type="password" inputmode="numeric" maxlength="6" placeholder="••••" autofocus />
+      <button type="submit" class="btn full" style="margin-top: 1rem;">Sign In</button>
+    </form>
+    <p style="margin-top: 1.25rem; font-size: 0.8rem;">Default PIN: <code style="color: var(--gold);">1234</code> · Change in Settings</p>
+  </div>
+</div>
+
+<!-- ── Main App ──────────────────────────────────── -->
+<div class="app" id="app">
+  <aside class="sidebar">
+    <div class="logo">The Finest <span>Pour</span></div>
+    <div class="role">Admin</div>
+    <div class="sb-link active" data-page="bookings"><span class="dot"></span> Bookings</div>
+    <div class="sb-link" data-page="availability"><span class="dot"></span> Availability</div>
+    <div class="sb-link" data-page="calendar"><span class="dot"></span> Calendar Sync</div>
+    <div class="sb-link" data-page="integrations"><span class="dot"></span> Integrations</div>
+    <div class="sb-link" data-page="settings"><span class="dot"></span> Settings</div>
+    <div class="sb-foot">
+      <a href="index.html" style="display: block; margin-bottom: 0.75rem;">View Public Site →</a>
+      <a href="#" id="signout">Sign out</a>
+    </div>
+  </aside>
+
+  <main>
+    <!-- ── Bookings page ─────────────────────────── -->
+    <div class="page active" id="page-bookings">
+      <div class="page-head">
+        <div>
+          <h1>Bookings</h1>
+          <p>All reservations. Confirm, reschedule, or cancel from here.</p>
+        </div>
+        <button class="btn" onclick="seedDemoBookings()">+ Add Demo Booking</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Pending</div>
+          <div class="stat-value" id="statPending">0</div>
+          <div class="stat-trend">Needs your review</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Confirmed</div>
+          <div class="stat-value" id="statConfirmed">0</div>
+          <div class="stat-trend">Locked in</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">This Month</div>
+          <div class="stat-value" id="statMonth">0</div>
+          <div class="stat-trend flat">events scheduled</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Revenue (MTD)</div>
+          <div class="stat-value" id="statRevenue">$0</div>
+          <div class="stat-trend flat">confirmed bookings</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h3>All Bookings</h3>
+            <p>Click a row for details</p>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <select id="filterStatus" style="width: auto; padding: 0.5rem 2rem 0.5rem 0.75rem;">
+              <option value="all">All statuses</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+        <div class="booking-list" id="bookingList"></div>
+      </div>
+    </div>
+
+    <!-- ── Availability page ─────────────────────── -->
+    <div class="page" id="page-availability">
+      <div class="page-head">
+        <div>
+          <h1>Availability</h1>
+          <p>Set your weekly working days, time slots, and blackout dates. Clients can only book what you make available here.</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><div><h3>Working days</h3><p>Tap to toggle on/off</p></div></div>
+        <div class="panel-body">
+          <div class="day-toggles" id="dayToggles"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><div><h3>Time slots</h3><p>Start times offered to clients on your working days</p></div></div>
+        <div class="panel-body">
+          <div class="slot-list" id="slotList"></div>
+          <div class="add-slot">
+            <input id="newSlot" type="time" />
+            <button class="btn outline sm" id="addSlot">Add Slot</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><div><h3>Booking window</h3><p>Lead time and how far out clients can book</p></div></div>
+        <div class="panel-body">
+          <div class="form-row two">
+            <div>
+              <label class="field">Minimum lead time (days)</label>
+              <input id="leadDays" type="number" min="0" />
+              <p class="help">Clients can't book closer than this many days from today.</p>
+            </div>
+            <div>
+              <label class="field">Booking window (days)</label>
+              <input id="windowDays" type="number" min="1" />
+              <p class="help">How far in advance clients can book.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><div><h3>Blackout dates</h3><p>Days you're not available regardless of working-day rules</p></div></div>
+        <div class="panel-body">
+          <div class="add-slot">
+            <input id="newBlackout" type="date" />
+            <button class="btn outline sm" id="addBlackout">Block Date</button>
+          </div>
+          <div class="blackout-list" id="blackoutList"></div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+        <button class="btn" id="saveAvail">Save Availability</button>
+      </div>
+    </div>
+
+    <!-- ── Calendar page ─────────────────────────── -->
+    <div class="page" id="page-calendar">
+      <div class="page-head">
+        <div>
+          <h1>Calendar Sync</h1>
+          <p>Connect your personal calendar so bookings flow both ways.</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><div><h3>Connected calendars</h3><p>Two-way sync coming soon</p></div></div>
+        <div class="panel-body">
+          <div class="integration-row">
+            <div class="info">
+              <strong>Google Calendar</strong>
+              <span>Sync bookings to your Google account · pulls busy times back</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:1rem;">
+              <span class="status" id="gcalStatus">Not connected</span>
+              <button class="btn outline sm" id="gcalBtn">Connect</button>
+            </div>
+          </div>
+          <div class="integration-row">
+            <div class="info">
+              <strong>Apple iCloud</strong>
+              <span>Subscribe to a public iCal feed of your bookings</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:1rem;">
+              <span class="status">Available</span>
+              <button class="btn outline sm" onclick="copyIcalUrl()">Copy iCal URL</button>
+            </div>
+          </div>
+          <div class="integration-row">
+            <div class="info">
+              <strong>Outlook</strong>
+              <span>Push events to Microsoft 365 / Outlook.com</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:1rem;">
+              <span class="status">Not connected</span>
+              <button class="btn outline sm" disabled>Connect</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><div><h3>Manual calendar URL</h3><p>Paste a calendar share link to display alongside bookings</p></div></div>
+        <div class="panel-body">
+          <div class="form-row">
+            <label class="field">Calendar share URL</label>
+            <input id="calUrl" type="text" placeholder="https://calendar.google.com/calendar/embed?src=..." />
+            <p class="help">If you have a Google Calendar share link, paste it here.</p>
+          </div>
+          <button class="btn outline" id="saveCal">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Integrations page ─────────────────────── -->
+    <div class="page" id="page-integrations">
+      <div class="page-head">
+        <div>
+          <h1>Integrations</h1>
+          <p>Connect tools to streamline your business.</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div class="integration-row">
+            <div class="info">
+              <strong>Resend (Email)</strong>
+              <span>Auto-send confirmation emails to clients & you on every booking</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:1rem;">
+              <span class="status">Not connected</span>
+              <button class="btn outline sm" disabled>Setup</button>
+            </div>
+          </div>
+          <div class="integration-row">
+            <div class="info">
+              <strong>Stripe</strong>
+              <span>Collect deposits and final payments online</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:1rem;">
+              <span class="status">Not connected</span>
+              <button class="btn outline sm" disabled>Setup</button>
+            </div>
+          </div>
+          <div class="integration-row">
+            <div class="info">
+              <strong>SMS Notifications</strong>
+              <span>Get a text the moment a new booking comes in</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:1rem;">
+              <span class="status">Not connected</span>
+              <button class="btn outline sm" disabled>Setup</button>
+            </div>
+          </div>
+          <div class="integration-row">
+            <div class="info">
+              <strong>Supabase Database</strong>
+              <span>Cloud-backed bookings, accessible from any device</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:1rem;">
+              <span class="status">Not connected</span>
+              <button class="btn outline sm" disabled>Connect</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Settings page ─────────────────────────── -->
+    <div class="page" id="page-settings">
+      <div class="page-head">
+        <div>
+          <h1>Settings</h1>
+          <p>Update your business info and admin PIN.</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><div><h3>Business info</h3><p>Shown on the public site and in confirmations</p></div></div>
+        <div class="panel-body">
+          <div class="form-row two">
+            <div><label class="field">Business name</label><input id="setBizName" type="text" /></div>
+            <div><label class="field">Phone</label><input id="setPhone" type="tel" /></div>
+          </div>
+          <div class="form-row two">
+            <div><label class="field">Email</label><input id="setEmail" type="email" /></div>
+            <div><label class="field">Service area</label><input id="setArea" type="text" /></div>
+          </div>
+          <button class="btn" id="saveBiz">Save Business Info</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><div><h3>Admin PIN</h3><p>Used to access this dashboard</p></div></div>
+        <div class="panel-body">
+          <div class="form-row two">
+            <div><label class="field">Current PIN</label><input id="curPin" type="password" /></div>
+            <div><label class="field">New PIN</label><input id="newPin" type="password" /></div>
+          </div>
+          <button class="btn" id="savePin">Update PIN</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><div><h3>Danger zone</h3><p>Reset all local data (bookings, settings, availability)</p></div></div>
+        <div class="panel-body">
+          <button class="btn danger" id="wipe">Reset All Data</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ── Booking detail modal ───────────────────────── -->
+<div class="modal-backdrop" id="detailModal">
+  <div class="modal">
+    <button class="modal-close" id="detailClose">×</button>
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── Storage (mirrors index.html keys) ───────────── */
+const Store = {
+  k: { availability: 'fp_availability', blackouts: 'fp_blackouts',
+       bookings: 'fp_bookings', settings: 'fp_settings' },
+  get(k, fb) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch { return fb; } },
+  set(k, v) { localStorage.setItem(k, JSON.stringify(v)); },
+};
+
+if (!Store.get(Store.k.availability)) {
+  Store.set(Store.k.availability, {
+    days: { 0: false, 1: false, 2: false, 3: false, 4: true, 5: true, 6: true },
+    slots: ['12:00', '14:00', '16:00', '18:00'],
+    leadDays: 7, windowDays: 180,
+  });
+}
+if (!Store.get(Store.k.blackouts)) Store.set(Store.k.blackouts, []);
+if (!Store.get(Store.k.bookings))  Store.set(Store.k.bookings, []);
+if (!Store.get(Store.k.settings))  Store.set(Store.k.settings, {
+  pin: '1234', calendarUrl: '',
+  businessName: 'The Finest Pour',
+  phone: '214-448-5485', email: 'finestpourtx@gmail.com',
+  area: 'Dallas / North Texas',
+});
+
+/* ── Sign-in ─────────────────────────────────────── */
+document.getElementById('pinForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const entered = document.getElementById('pin').value.trim();
+  const settings = Store.get(Store.k.settings);
+  if (entered === settings.pin) { showApp(); }
+  else { toast('Incorrect PIN', true); }
+});
+function showApp() {
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('app').classList.add('active');
+  renderAll();
+}
+document.getElementById('signout').addEventListener('click', e => {
+  e.preventDefault();
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('gate').style.display = 'flex';
+  document.getElementById('pin').value = '';
+});
+
+/* ── Sidebar nav ─────────────────────────────────── */
+document.querySelectorAll('.sb-link').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.sb-link').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('page-' + el.dataset.page).classList.add('active');
+  });
+});
+
+/* ── Render bookings ─────────────────────────────── */
+function renderBookings() {
+  const all = Store.get(Store.k.bookings) || [];
+  const filter = document.getElementById('filterStatus').value;
+  const filtered = (filter === 'all' ? all : all.filter(b => b.status === filter))
+    .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+
+  const list = document.getElementById('bookingList');
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty">No bookings yet. Once clients book, they'll appear here.</div>`;
+  } else {
+    let html = `<div class="booking-row head">
+      <div>ID</div><div>Client</div><div>Service</div><div>Date</div><div>Status</div><div>Total</div>
+    </div>`;
+    html += filtered.map(b => `
+      <div class="booking-row" onclick="showDetail('${b.id}')" style="cursor:pointer;">
+        <div class="b-id">${b.id}</div>
+        <div class="b-name">${b.name || '—'}<span>${b.phone || ''}</span></div>
+        <div class="b-svc">${b.serviceName}<span>${b.guests || '—'} guests</span></div>
+        <div class="b-date">${prettyDate(b.date)}<span>${prettyTime(b.time)}</span></div>
+        <div><span class="pill ${b.status}">${b.status}</span></div>
+        <div class="b-svc">$${b.price}</div>
+      </div>
+    `).join('');
+    list.innerHTML = html;
+  }
+
+  // stats
+  const pending   = all.filter(b => b.status === 'pending').length;
+  const confirmed = all.filter(b => b.status === 'confirmed').length;
+  const now = new Date();
+  const month = all.filter(b => {
+    if (b.status === 'cancelled') return false;
+    const [y, m] = b.date.split('-').map(Number);
+    return y === now.getFullYear() && m === now.getMonth() + 1;
+  });
+  const revenue = month.filter(b => b.status === 'confirmed').reduce((s, b) => s + (b.price || 0), 0);
+
+  document.getElementById('statPending').textContent = pending;
+  document.getElementById('statConfirmed').textContent = confirmed;
+  document.getElementById('statMonth').textContent = month.length;
+  document.getElementById('statRevenue').textContent = '$' + revenue.toLocaleString();
+}
+document.getElementById('filterStatus').addEventListener('change', renderBookings);
+
+/* ── Booking detail modal ────────────────────────── */
+function showDetail(id) {
+  const all = Store.get(Store.k.bookings) || [];
+  const b = all.find(x => x.id === id);
+  if (!b) return;
+  document.getElementById('detailContent').innerHTML = `
+    <h3>${b.name || 'Booking'} <span style="color: var(--text-muted); font-family: monospace; font-size: 0.85rem;">${b.id}</span></h3>
+    <p style="color: var(--text-dim); margin-bottom: 1.5rem;">${b.serviceName} · $${b.price}</p>
+
+    <div style="margin-bottom: 1.5rem;">
+      <div class="detail-row"><div class="lbl">Status</div><div class="val"><span class="pill ${b.status}">${b.status}</span></div></div>
+      <div class="detail-row"><div class="lbl">Date</div><div class="val">${prettyDate(b.date)} at ${prettyTime(b.time)}</div></div>
+      <div class="detail-row"><div class="lbl">Phone</div><div class="val"><a href="tel:${b.phone}">${b.phone || '—'}</a></div></div>
+      <div class="detail-row"><div class="lbl">Email</div><div class="val"><a href="mailto:${b.email}">${b.email || '—'}</a></div></div>
+      <div class="detail-row"><div class="lbl">Guests</div><div class="val">${b.guests || '—'}</div></div>
+      <div class="detail-row"><div class="lbl">Venue</div><div class="val">${b.venue || '—'}</div></div>
+      <div class="detail-row"><div class="lbl">Notes</div><div class="val">${b.notes || '—'}</div></div>
+      <div class="detail-row"><div class="lbl">Booked</div><div class="val">${new Date(b.createdAt).toLocaleString()}</div></div>
+    </div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      ${b.status !== 'confirmed' ? `<button class="btn" onclick="setStatus('${b.id}', 'confirmed')">Confirm</button>` : ''}
+      ${b.status !== 'cancelled' ? `<button class="btn ghost" onclick="setStatus('${b.id}', 'cancelled')">Cancel</button>` : ''}
+      ${b.status === 'cancelled' ? `<button class="btn outline" onclick="setStatus('${b.id}', 'pending')">Reopen</button>` : ''}
+      <button class="btn ghost" onclick="closeDetail()">Close</button>
+    </div>
+  `;
+  document.getElementById('detailModal').classList.add('open');
+}
+function closeDetail() { document.getElementById('detailModal').classList.remove('open'); }
+document.getElementById('detailClose').addEventListener('click', closeDetail);
+document.getElementById('detailModal').addEventListener('click', e => {
+  if (e.target.id === 'detailModal') closeDetail();
+});
+function setStatus(id, status) {
+  const all = Store.get(Store.k.bookings) || [];
+  const b = all.find(x => x.id === id);
+  if (b) { b.status = status; Store.set(Store.k.bookings, all); }
+  toast(`Booking ${status}.`);
+  closeDetail();
+  renderBookings();
+}
+
+/* ── Availability ───────────────────────────────── */
+const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DAY_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+function renderAvailability() {
+  const a = Store.get(Store.k.availability);
+  document.getElementById('dayToggles').innerHTML = DAYS.map((d, i) => `
+    <div class="day-toggle ${a.days[i] ? 'on' : ''}" data-day="${i}">
+      <span class="d">${DAY_SHORT[i].charAt(0)}</span>
+      <span class="lbl">${DAY_SHORT[i]}</span>
+    </div>
+  `).join('');
+  document.querySelectorAll('[data-day]').forEach(el => {
+    el.addEventListener('click', () => {
+      const i = +el.dataset.day;
+      const cur = Store.get(Store.k.availability);
+      cur.days[i] = !cur.days[i];
+      Store.set(Store.k.availability, cur);
+      renderAvailability();
+    });
+  });
+
+  document.getElementById('slotList').innerHTML = (a.slots || []).map(t => `
+    <span class="slot-pill">${prettyTime(t)} <button onclick="removeSlot('${t}')">×</button></span>
+  `).join('') || '<span class="help">No slots — clients won\'t see any times. Add one below.</span>';
+
+  document.getElementById('leadDays').value = a.leadDays ?? 7;
+  document.getElementById('windowDays').value = a.windowDays ?? 180;
+
+  const blacks = Store.get(Store.k.blackouts) || [];
+  document.getElementById('blackoutList').innerHTML = blacks.length === 0
+    ? '<div class="help">No blackout dates yet.</div>'
+    : blacks.sort().map(d => `
+      <div class="blackout-row"><span>${prettyDate(d)}</span><button onclick="removeBlackout('${d}')">×</button></div>
+    `).join('');
+}
+function removeSlot(t) {
+  const a = Store.get(Store.k.availability);
+  a.slots = a.slots.filter(x => x !== t);
+  Store.set(Store.k.availability, a);
+  renderAvailability();
+}
+function removeBlackout(d) {
+  const b = (Store.get(Store.k.blackouts) || []).filter(x => x !== d);
+  Store.set(Store.k.blackouts, b);
+  renderAvailability();
+}
+document.getElementById('addSlot').addEventListener('click', () => {
+  const v = document.getElementById('newSlot').value;
+  if (!v) return;
+  const a = Store.get(Store.k.availability);
+  if (!a.slots.includes(v)) { a.slots.push(v); a.slots.sort(); Store.set(Store.k.availability, a); }
+  document.getElementById('newSlot').value = '';
+  renderAvailability();
+});
+document.getElementById('addBlackout').addEventListener('click', () => {
+  const v = document.getElementById('newBlackout').value;
+  if (!v) return;
+  const b = Store.get(Store.k.blackouts) || [];
+  if (!b.includes(v)) { b.push(v); Store.set(Store.k.blackouts, b); }
+  document.getElementById('newBlackout').value = '';
+  renderAvailability();
+});
+document.getElementById('saveAvail').addEventListener('click', () => {
+  const a = Store.get(Store.k.availability);
+  a.leadDays = +document.getElementById('leadDays').value || 0;
+  a.windowDays = +document.getElementById('windowDays').value || 180;
+  Store.set(Store.k.availability, a);
+  toast('Availability saved.');
+});
+
+/* ── Calendar sync ─────────────────────────────── */
+function renderCalendar() {
+  const s = Store.get(Store.k.settings);
+  document.getElementById('calUrl').value = s.calendarUrl || '';
+  document.getElementById('gcalStatus').textContent = s.calendarUrl ? 'Linked (manual URL)' : 'Not connected';
+  document.getElementById('gcalStatus').classList.toggle('on', !!s.calendarUrl);
+  document.getElementById('gcalBtn').textContent = s.calendarUrl ? 'Manage' : 'Connect';
+}
+document.getElementById('saveCal').addEventListener('click', () => {
+  const s = Store.get(Store.k.settings);
+  s.calendarUrl = document.getElementById('calUrl').value.trim();
+  Store.set(Store.k.settings, s);
+  renderCalendar();
+  toast('Calendar URL saved.');
+});
+document.getElementById('gcalBtn').addEventListener('click', () => {
+  toast('Google OAuth will be wired in once Supabase is connected.', false);
+});
+function copyIcalUrl() {
+  const fakeUrl = 'webcal://finestpourtx.com/api/ical/' + Math.random().toString(36).slice(2, 10);
+  navigator.clipboard?.writeText(fakeUrl);
+  toast('iCal URL copied (demo).');
+}
+
+/* ── Settings ──────────────────────────────────── */
+function renderSettings() {
+  const s = Store.get(Store.k.settings);
+  document.getElementById('setBizName').value = s.businessName || '';
+  document.getElementById('setPhone').value = s.phone || '';
+  document.getElementById('setEmail').value = s.email || '';
+  document.getElementById('setArea').value = s.area || '';
+}
+document.getElementById('saveBiz').addEventListener('click', () => {
+  const s = Store.get(Store.k.settings);
+  s.businessName = document.getElementById('setBizName').value.trim();
+  s.phone = document.getElementById('setPhone').value.trim();
+  s.email = document.getElementById('setEmail').value.trim();
+  s.area = document.getElementById('setArea').value.trim();
+  Store.set(Store.k.settings, s);
+  toast('Business info saved.');
+});
+document.getElementById('savePin').addEventListener('click', () => {
+  const cur = document.getElementById('curPin').value;
+  const next = document.getElementById('newPin').value;
+  const s = Store.get(Store.k.settings);
+  if (cur !== s.pin) return toast('Current PIN is incorrect', true);
+  if (!next || next.length < 4) return toast('New PIN must be at least 4 digits', true);
+  s.pin = next; Store.set(Store.k.settings, s);
+  document.getElementById('curPin').value = '';
+  document.getElementById('newPin').value = '';
+  toast('PIN updated.');
+});
+document.getElementById('wipe').addEventListener('click', () => {
+  if (!confirm('Reset all local data? This cannot be undone.')) return;
+  Object.values(Store.k).forEach(k => localStorage.removeItem(k));
+  toast('Data reset. Reloading…');
+  setTimeout(() => location.reload(), 800);
+});
+
+/* ── Demo seed ─────────────────────────────────── */
+function seedDemoBookings() {
+  const all = Store.get(Store.k.bookings) || [];
+  const samples = [
+    { name: 'Megan Caldwell', phone: '214-555-0188', email: 'megan@example.com',
+      serviceId: 'total-bar', serviceName: 'Total Bar Package', price: 700,
+      guests: '85', venue: 'Knotting Hill Place, Little Elm', notes: 'Wedding reception. Signature drink: spicy margarita.',
+      status: 'pending' },
+    { name: 'James Rivera', phone: '469-555-0144', email: 'jrivera@example.com',
+      serviceId: 'cocktail', serviceName: 'Cocktail Package', price: 500,
+      guests: '40', venue: '6202 Bonnie Hill Dr, Dallas', notes: 'Backyard 40th birthday.',
+      status: 'confirmed' },
+    { name: 'Priya Anand', phone: '972-555-0119', email: 'priya@example.com',
+      serviceId: 'coffee', serviceName: 'Coffee Package', price: 400,
+      guests: '60', venue: 'The Pearl Hotel, Frisco', notes: 'Corporate brunch.',
+      status: 'confirmed' },
+  ];
+  const today = new Date();
+  samples.forEach((s, i) => {
+    const d = new Date(today); d.setDate(d.getDate() + 14 + i * 7);
+    all.push({
+      id: 'FP-' + Date.now().toString(36).toUpperCase().slice(-6) + i,
+      createdAt: new Date().toISOString(),
+      date: isoDate(d), time: ['14:00','16:00','12:00'][i % 3],
+      ...s,
+    });
+  });
+  Store.set(Store.k.bookings, all);
+  renderBookings();
+  toast('Demo bookings added.');
+}
+
+/* ── Helpers ───────────────────────────────────── */
+function isoDate(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function prettyDate(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
+}
+function prettyTime(t) {
+  const [h, m] = t.split(':').map(Number);
+  const h12 = h === 0 ? 12 : (h > 12 ? h - 12 : h);
+  return `${h12}:${String(m).padStart(2,'0')} ${h < 12 ? 'AM' : 'PM'}`;
+}
+function toast(msg, error) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.toggle('error', !!error);
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+function renderAll() {
+  renderBookings();
+  renderAvailability();
+  renderCalendar();
+  renderSettings();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+# Pretty URLs
+/admin    /admin.html    200
+/book     /index.html    200
+
+# 404 fallback to landing
+/*        /index.html    404
