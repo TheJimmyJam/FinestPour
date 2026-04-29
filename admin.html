@@ -4,6 +4,11 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Admin · The Finest Pour</title>
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
+<meta name="theme-color" content="#0c0c0d" />
+<meta name="robots" content="noindex,nofollow" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -56,10 +61,11 @@
     text-align: center;
     border-radius: var(--radius);
   }
-  .gate-card .logo {
-    font-family: var(--serif); font-size: 1.8rem; margin-bottom: 0.4rem;
+  .gate-card .logo-mark {
+    height: 130px; width: auto; margin: 0 auto 0.75rem;
+    display: block;
+    filter: drop-shadow(0 6px 24px rgba(201,169,97,0.2));
   }
-  .gate-card .logo span { color: var(--gold); font-style: italic; }
   .gate-card .sub {
     font-size: 0.72rem; letter-spacing: 0.32em;
     text-transform: uppercase; color: var(--gold);
@@ -110,11 +116,10 @@
     position: sticky; top: 0; height: 100vh;
     overflow-y: auto;
   }
-  .sidebar .logo {
-    font-family: var(--serif); font-size: 1.45rem;
-    padding: 0 2rem; margin-bottom: 0.2rem;
+  .sidebar .logo-mark {
+    display: block; height: 64px; width: auto;
+    padding: 0 2rem 0.4rem; margin: 0;
   }
-  .sidebar .logo span { color: var(--gold); font-style: italic; }
   .sidebar .role {
     padding: 0 2rem; margin-bottom: 2.5rem;
     font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase;
@@ -346,7 +351,7 @@
 <!-- ── Login gate ────────────────────────────────── -->
 <div class="gate" id="gate">
   <div class="gate-card">
-    <div class="logo">The Finest <span>Pour</span></div>
+    <img class="logo-mark" src="assets/logo.png" alt="The Finest Pour" />
     <div class="sub">Admin Portal</div>
     <h2>Welcome back</h2>
     <p>Enter your PIN to manage bookings, availability, and settings.</p>
@@ -361,7 +366,7 @@
 <!-- ── Main App ──────────────────────────────────── -->
 <div class="app" id="app">
   <aside class="sidebar">
-    <div class="logo">The Finest <span>Pour</span></div>
+    <img class="logo-mark" src="assets/logo.png" alt="The Finest Pour" />
     <div class="role">Admin</div>
     <div class="sb-link active" data-page="bookings"><span class="dot"></span> Bookings</div>
     <div class="sb-link" data-page="availability"><span class="dot"></span> Availability</div>

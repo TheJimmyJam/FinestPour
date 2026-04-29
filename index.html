@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>The Finest Pour | Private Event Bartending | Dallas, TX</title>
 <meta name="description" content="The Finest Pour — premier mobile bartending and beverage service for weddings, corporate events, and private parties across North Texas." />
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
+<meta name="theme-color" content="#0c0c0d" />
+<meta property="og:title" content="The Finest Pour · Private Event Bartending" />
+<meta property="og:description" content="Mobile bar service for weddings, corporate events, and private parties across North Texas." />
+<meta property="og:image" content="assets/logo-square.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -93,8 +101,20 @@
     font-size: 1.6rem;
     letter-spacing: 0.02em;
     line-height: 1;
+    display: inline-flex; align-items: center;
   }
   .logo span { color: var(--gold); font-style: italic; }
+  .logo-img {
+    height: 44px; width: auto; display: block;
+    filter: drop-shadow(0 2px 8px rgba(201,169,97,0.15));
+  }
+  .logo-mark {
+    height: 200px; width: auto;
+    display: block; margin: 0 auto 1.5rem;
+    filter: drop-shadow(0 6px 30px rgba(201,169,97,0.18));
+  }
+  @media (max-width: 540px) { .logo-mark { height: 150px; } }
+  .logo-foot { height: 64px; width: auto; margin-bottom: 1rem; }
   .nav-links { display: flex; gap: 2.2rem; align-items: center; }
   .nav-links a {
     font-size: 0.85rem;
@@ -522,7 +542,7 @@
 
 <nav class="top" id="topnav">
   <div class="nav-inner">
-    <a href="#" class="logo">The Finest <span>Pour</span></a>
+    <a href="#" class="logo" aria-label="The Finest Pour"><img class="logo-img" src="assets/logo.png" alt="The Finest Pour · Private Bartending" /></a>
     <button class="nav-toggle" id="navToggle" aria-label="Menu">☰</button>
     <div class="nav-links" id="navLinks">
       <a href="#about">About</a>
@@ -537,9 +557,10 @@
 <!-- ── Hero ─────────────────────────────────────────── -->
 <section class="hero">
   <div class="hero-inner">
-    <div class="eyebrow">Private Event Bartending · Dallas, TX</div>
+    <img class="logo-mark" src="assets/logo.png" alt="The Finest Pour · Private Bartending" />
+    <div class="eyebrow">Dallas · Fort Worth · North Texas</div>
     <h1>Crafted cocktails,<br/><em>unforgettable</em> moments.</h1>
-    <p class="hero-sub">Mobile bar service for weddings, corporate events, and private gatherings across North Texas. Cocktails, mocktails, coffee, and lemonade — fully styled, fully staffed.</p>
+    <p class="hero-sub">Mobile bar service for weddings, corporate events, and private gatherings. Cocktails, mocktails, coffee, and lemonade — fully styled, fully staffed.</p>
     <div class="hero-cta">
       <a href="#" class="btn" data-open-booking>Reserve Your Date</a>
       <a href="#services" class="btn ghost">View Packages</a>
@@ -626,7 +647,7 @@
   <div class="container">
     <div class="footer-grid">
       <div>
-        <div class="logo" style="margin-bottom: 1rem;">The Finest <span>Pour</span></div>
+        <img class="logo-foot" src="assets/logo.png" alt="The Finest Pour" />
         <p>Private event bartending and beverage service for weddings, corporate events, and gatherings across North Texas.</p>
       </div>
       <div>
